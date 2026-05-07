@@ -189,6 +189,29 @@ body {
     box-shadow: 0 2px 12px rgba(244, 63, 94, 0.3);
 }
 
+.github-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
+    background: rgba(255, 255, 255, 0.04);
+    transition: var(--transition);
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.github-link:hover {
+    color: white;
+    border-color: var(--accent-indigo);
+    background: rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    transform: translateY(-2px);
+}
+
 /* ===== Hero ===== */
 .hero {
     position: relative;

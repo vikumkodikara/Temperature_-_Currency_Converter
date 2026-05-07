@@ -3,8 +3,8 @@
    =================================================== */
 
 // API Endpoints
-const CURRENCY_API = 'http://localhost:8082/api/currency';
-const TEMP_API = 'http://localhost:8081/api/temperatures';
+const CURRENCY_API = 'https://currency-converter.vikumkodikara123.workers.dev/api/currency';
+const TEMP_API = 'https://temperature-converter.vikumkodikara123.workers.dev/api/temperatures';
 
 // ==========================================
 //  TAB SWITCHING
