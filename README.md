@@ -2,6 +2,8 @@
 
 <div align="center">
 
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-converterhub.vikumkodikara.dev-00C853?style=for-the-badge&logoColor=white)](https://converterhub.vikumkodikara.dev/)
+
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
@@ -10,6 +12,8 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 **A full-stack microservices application featuring Temperature and Currency conversion with a modern glassmorphism UI, built with Spring Boot and MongoDB.**
+
+🔗 **[View Live Demo →](https://converterhub.vikumkodikara.dev/)**
 
 [Features](#-features) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [API Reference](#-api-reference) • [Screenshots](#-screenshots)
 
