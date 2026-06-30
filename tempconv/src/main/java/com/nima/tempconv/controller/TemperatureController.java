@@ -6,11 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nima.tempconv.exception.UnauthorizedException;
 import com.nima.tempconv.model.TemperatureLog;
 import com.nima.tempconv.service.TemperatureService;
 
@@ -26,8 +28,11 @@ public class TemperatureController {
     }
 
     @PostMapping("/convert")
-    public TemperatureLog convert(@RequestParam double value, @RequestParam String unit) {
-        return temperatureService.convertAndSave(value, unit);
+    public TemperatureLog convert(
+            @RequestParam double value,
+            @RequestParam String unit,
+            @RequestHeader(value = "X-API-KEY", required = false) String apiKey) {
+        return temperatureService.convertAndSave(value, unit, apiKey);
     }
 
     @GetMapping("/history")
@@ -50,6 +55,12 @@ public class TemperatureController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @org.springframework.web.bind.annotation.ExceptionHandler(IllegalArgumentException.class)
     public String handleInvalidUnit(IllegalArgumentException ex) {
+        return ex.getMessage();
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @org.springframework.web.bind.annotation.ExceptionHandler(UnauthorizedException.class)
+    public String handleUnauthorized(UnauthorizedException ex) {
         return ex.getMessage();
     }
 }

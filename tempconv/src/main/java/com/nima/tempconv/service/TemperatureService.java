@@ -6,19 +6,39 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
+import com.nima.tempconv.exception.UnauthorizedException;
+import com.nima.tempconv.model.ApiKey;
 import com.nima.tempconv.model.TemperatureLog;
+import com.nima.tempconv.repository.ApiKeyRepository;
 import com.nima.tempconv.repository.TemperatureRepository;
 
 @Service
 public class TemperatureService {
 
     private final TemperatureRepository temperatureRepository;
+    private final ApiKeyRepository apiKeyRepository;
 
-    public TemperatureService(TemperatureRepository temperatureRepository) {
+    public TemperatureService(TemperatureRepository temperatureRepository, ApiKeyRepository apiKeyRepository) {
         this.temperatureRepository = temperatureRepository;
+        this.apiKeyRepository = apiKeyRepository;
     }
 
-    public TemperatureLog convertAndSave(double value, String unit) {
+    public void validateApiKey(String apiKey) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new UnauthorizedException("Header X-API-KEY is missing");
+        }
+
+        ApiKey record = apiKeyRepository.findByKeyValue(apiKey.trim())
+                .orElseThrow(() -> new UnauthorizedException("Invalid API key"));
+
+        if (!record.isActive()) {
+            throw new UnauthorizedException("API key is inactive or expired");
+        }
+    }
+
+    public TemperatureLog convertAndSave(double value, String unit, String apiKey) {
+        validateApiKey(apiKey);
+
         String normalizedUnit = normalize(unit);
         double outputValue;
         String outputUnit;
