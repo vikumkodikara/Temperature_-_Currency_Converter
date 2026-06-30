@@ -35,6 +35,18 @@ public class TemperatureController {
         return temperatureService.getHistory();
     }
 
+    // Exercise 1: Safety check endpoint - returns plain text
+    @GetMapping("/safety-check")
+    public String safetyCheck(@RequestParam double value, @RequestParam String unit) {
+        return temperatureService.safetyCheck(value, unit);
+    }
+
+    // Exercise 2: Filter history by input unit - returns JSON array
+    @GetMapping("/history/filter")
+    public List<TemperatureLog> filterHistory(@RequestParam String unit) {
+        return temperatureService.getHistoryByUnit(unit);
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @org.springframework.web.bind.annotation.ExceptionHandler(IllegalArgumentException.class)
     public String handleInvalidUnit(IllegalArgumentException ex) {
