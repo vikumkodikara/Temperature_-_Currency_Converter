@@ -4,7 +4,9 @@
 
 // API Endpoints
 const CURRENCY_API = 'https://currency-converter.vikumkodikara123.workers.dev/api/currency';
-const TEMP_API = 'https://temperature-converter.vikumkodikara123.workers.dev/api/temperatures';
+const TEMP_API = 'http://localhost:8081/api/temperatures'; // Local testing
+// const TEMP_API = 'https://temperature-converter.vikumkodikara123.workers.dev/api/temperatures'; // Deployed
+const TEMP_API_KEY = 'SUPER-SECRET-DEV-KEY-123'; // Must match a key in MongoDB api_keys collection
 
 // ==========================================
 //  TAB SWITCHING
@@ -142,7 +144,10 @@ async function convertTemperature() {
 
     try {
         const res = await fetch(`${TEMP_API}/convert?value=${value}&unit=${unit}`, {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'X-API-KEY': TEMP_API_KEY
+            }
         });
 
         if (!res.ok) {
@@ -159,13 +164,14 @@ async function convertTemperature() {
         const unitSymbols = { Celsius: '°C', Fahrenheit: '°F', Kelvin: 'K' };
         const inSymbol = unitSymbols[data.inputUnit] || '';
         const outSymbol = unitSymbols[data.outputUnit] || '';
+        const safety = getSafetyStatus(data.inputTemperature, data.inputUnit);
 
         document.getElementById('temp-input-val').textContent = `${formatNumber(data.inputTemperature)} ${inSymbol}`;
         document.getElementById('temp-output-val').textContent = `${formatNumber(data.outputTemperature)} ${outSymbol}`;
-        document.getElementById('temp-unit-info').textContent = `${data.inputUnit} → ${data.outputUnit}`;
+        document.getElementById('temp-unit-info').textContent = `${data.inputUnit} → ${data.outputUnit} • ${safety.label}`;
         document.getElementById('temp-time-info').textContent = formatTimestamp(data.timestamp);
 
-        showToast('Conversion successful! 🔥', 'success');
+        showToast(`Conversion successful! ${safety.icon} ${safety.label}`, 'success');
         loadTempHistory();
 
     } catch (err) {
@@ -213,6 +219,58 @@ async function loadTempHistory() {
 }
 
 // ==========================================
+//  EXERCISE 2: FILTERED HISTORY
+// ==========================================
+async function filterHistory() {
+    const unit = document.getElementById('filter-unit').value;
+    const tbody = document.getElementById('filtered-history-body');
+    const btn = document.getElementById('btn-filter-history');
+
+    btn.classList.add('loading');
+    btn.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="30 60"/></svg>
+        Filtering...
+    `;
+
+    try {
+        const res = await fetch(`${TEMP_API}/history/filter?unit=${unit}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        if (!data.length) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No records found for this unit</td></tr>';
+            showToast(`No ${unit} records found`, 'error');
+            return;
+        }
+
+        const unitSymbols = { Celsius: '°C', Fahrenheit: '°F', Kelvin: 'K' };
+        const sorted = [...data].reverse();
+
+        tbody.innerHTML = sorted.map((item, i) => `
+            <tr style="animation: fadeInUp 0.3s ease-out ${i * 0.05}s both">
+                <td style="color: var(--text-muted)">${sorted.length - i}</td>
+                <td><strong>${formatNumber(item.inputTemperature)} ${unitSymbols[item.inputUnit] || ''}</strong></td>
+                <td style="color: var(--accent-rose); font-weight: 600">${formatNumber(item.outputTemperature)} ${unitSymbols[item.outputUnit] || ''}</td>
+                <td>${item.inputUnit} → ${item.outputUnit}</td>
+                <td style="color: var(--text-secondary); font-size: 0.75rem">${formatTimestamp(item.timestamp)}</td>
+            </tr>
+        `).join('');
+
+        showToast(`Found ${data.length} ${unit} records! 🔍`, 'success');
+
+    } catch (err) {
+        console.error('Filter history error:', err);
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="5" style="color: var(--accent-rose)">⚠ Could not filter history. Is server running?</td></tr>';
+    } finally {
+        btn.classList.remove('loading');
+        btn.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            Filter
+        `;
+    }
+}
+
+// ==========================================
 //  UTILITIES
 // ==========================================
 function formatNumber(num) {
@@ -238,6 +296,33 @@ function formatTimestamp(ts) {
     } catch {
         return ts;
     }
+}
+
+function getSafetyStatus(value, unit) {
+    const normalizedUnit = String(unit || '').toLowerCase();
+    let celsius;
+
+    if (normalizedUnit === 'celsius' || normalizedUnit === 'c') {
+        celsius = Number(value);
+    } else if (normalizedUnit === 'fahrenheit' || normalizedUnit === 'f') {
+        celsius = (Number(value) - 32) * 5 / 9;
+    } else if (normalizedUnit === 'kelvin' || normalizedUnit === 'k') {
+        celsius = Number(value) - 273.15;
+    } else {
+        return { label: 'Safety unknown', icon: 'ℹ️' };
+    }
+
+    if (!Number.isFinite(celsius)) {
+        return { label: 'Safety unknown', icon: 'ℹ️' };
+    }
+
+    if (celsius >= 40) {
+        return { label: 'Safety: HOT', icon: '🔥' };
+    }
+    if (celsius <= 0) {
+        return { label: 'Safety: COLD', icon: '❄️' };
+    }
+    return { label: 'Safety: SAFE', icon: '✅' };
 }
 
 function showToast(message, type = 'success') {
