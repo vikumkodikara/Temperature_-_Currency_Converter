@@ -32,32 +32,33 @@
 
 ---
 
-## 🏗 Architecture
+## 🏗 Architecture (Dockerized)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                    ConvertHub Frontend                    │
-│              (HTML / CSS / JavaScript)                    │
-│                  Opens on any browser                     │
+│                    Browser (Port 80)                     │
+└──────────────────────────┬───────────────────────────────┘
+                           │
+┌──────────────────────────▼───────────────────────────────┐
+│                 Nginx (Reverse Proxy)                    │
+│            Serves static HTML/CSS/JS files               │
 └──────────┬──────────────────────────────┬────────────────┘
            │                              │
-     Port 8081                      Port 8082
+    /api/temperatures              /api/currency
            │                              │
 ┌──────────▼──────────┐     ┌─────────────▼───────────────┐
 │  Temperature Conv.  │     │    Currency Converter        │
-│  (Spring Boot 4.0)  │     │    (Spring Boot 4.0)        │
-│                     │     │                             │
-│  • Controller       │     │  • Controller               │
-│  • Service          │     │  • Service                  │
-│  • Repository       │     │  • Repository               │
-│  • Model            │     │  • Model                    │
+│  (Spring Boot :8081)│     │    (Spring Boot :8082)      │
 └──────────┬──────────┘     └─────────────┬───────────────┘
            │                              │
-     Port 27017                     Port 27018
-           │                              │
-┌──────────▼──────────┐     ┌─────────────▼───────────────┐
-│   MongoDB (temp_db) │     │   MongoDB (currency_db)     │
-└─────────────────────┘     └─────────────────────────────┘
+           └───────────────┬──────────────┘
+                           │
+                    Port 27017 (Internal)
+                           │
+┌──────────────────────────▼───────────────────────────────┐
+│                 MongoDB (mongo:7.0)                      │
+│        Shared Database for temp_db & currency_db         │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -67,47 +68,22 @@
 ```
 Temperature_-_Currency_Converter/
 │
+├── docker-compose.yml                 # 🐳 Docker Compose orchestration
 ├── tempconv/                          # 🌡️ Temperature Converter Microservice
+│   ├── Dockerfile                     # Multi-stage Maven build
 │   ├── pom.xml                        # Maven dependencies (Spring Boot 4.0.5)
-│   ├── mvnw / mvnw.cmd               # Maven wrapper scripts
 │   └── src/
-│       ├── main/
-│       │   ├── java/com/nima/tempconv/
-│       │   │   ├── TempconvApplication.java        # Entry point + CORS config
-│       │   │   ├── controller/
-│       │   │   │   └── TemperatureController.java   # REST endpoints
-│       │   │   ├── service/
-│       │   │   │   └── TemperatureService.java      # Conversion logic
-│       │   │   ├── model/
-│       │   │   │   └── TemperatureLog.java           # MongoDB document
-│       │   │   └── repository/
-│       │   │       └── TemperatureRepository.java    # Data access layer
-│       │   └── resources/
-│       │       └── application.yaml                  # Server & DB config
-│       └── test/
-│           └── java/.../TempconvApplicationTests.java
+│       └── ...
 │
 ├── currencyconvertor/                 # 💱 Currency Converter Microservice
+│   ├── Dockerfile                     # Multi-stage Maven build
 │   ├── pom.xml                        # Maven dependencies (Spring Boot 4.0.6)
-│   ├── mvnw / mvnw.cmd               # Maven wrapper scripts
 │   └── src/
-│       ├── main/
-│       │   ├── java/com/usdtolkr/currencyconvertor/
-│       │   │   ├── CurrencyconvertorApplication.java  # Entry point + CORS
-│       │   │   ├── controller/
-│       │   │   │   └── CurrencyController.java         # REST endpoints
-│       │   │   ├── service/
-│       │   │   │   └── CurrencyService.java             # Exchange logic
-│       │   │   ├── model/
-│       │   │   │   └── CurrencyLog.java                 # MongoDB document
-│       │   │   └── Repository/
-│       │   │       └── CurrencyRepository.java          # Data access layer
-│       │   └── resources/
-│       │       └── application.yaml                     # Server & DB config
-│       └── test/
-│           └── java/.../CurrencyconvertorApplicationTests.java
+│       └── ...
 │
 └── frontend/                          # 🎨 Web Frontend
+    ├── Dockerfile                     # Nginx static file server
+    ├── nginx.conf                     # Reverse proxy configuration
     ├── index.html                     # Main HTML structure
     ├── style.css                      # Glassmorphism CSS styling
     └── app.js                         # API integration & DOM logic
@@ -121,56 +97,54 @@ Temperature_-_Currency_Converter/
 
 | Requirement | Version |
 |-------------|---------|
-| **Java JDK** | 21+ |
-| **Maven** | 3.9+ (or use included `mvnw`) |
-| **MongoDB** | 6.0+ |
-| **Browser** | Any modern browser |
+| **Docker** | Latest |
+| **Docker Compose** | V2 |
 
-### 1️⃣ Start MongoDB Instances
+### 🐳 Run with Docker (Recommended)
 
-The application requires **two separate MongoDB instances**:
+The easiest way to run the application is using Docker Compose. It will automatically build the backend JARs, set up the Nginx proxy, and start the MongoDB database.
 
 ```bash
-# Terminal 1: MongoDB for Temperature Converter (port 27017)
-mongod --port 27017 --dbpath /data/temp_db
+# Build and start all containers in detached mode
+docker compose up -d --build
 
-# Terminal 2: MongoDB for Currency Converter (port 27018)
-mongod --port 27018 --dbpath /data/currency_db
+# View logs for all containers
+docker compose logs -f
+
+# Stop and remove containers
+docker compose down
+
+# Stop and remove containers AND delete the database volume
+docker compose down -v
 ```
 
-> **💡 Tip:** If using Docker, you can spin up both with:
-> ```bash
-> docker run -d -p 27017:27017 --name mongo-temp mongo:latest
-> docker run -d -p 27018:27017 --name mongo-currency mongo:latest
-> ```
+Once running, simply open your browser to **http://localhost**
 
-### 2️⃣ Start Temperature Converter Backend
+> **Note:** The first build may take 5-10 minutes as it downloads the Maven dependencies and Docker images. Subsequent builds will be much faster.
 
+### 🛠️ Run Manually (For Development)
+
+If you prefer to run the services without Docker, you will need Java 21 and MongoDB installed locally.
+
+**1. Start MongoDB**
+Start a local MongoDB instance on port `27017`. Both backends are configured to connect to `mongodb://localhost:27017`.
+
+**2. Start Temperature Converter**
 ```bash
 cd tempconv
 ./mvnw spring-boot:run
 ```
+*(Starts on http://localhost:8081)*
 
-✅ Server starts on **http://localhost:8081**
-
-### 3️⃣ Start Currency Converter Backend
-
+**3. Start Currency Converter**
 ```bash
 cd currencyconvertor
 ./mvnw spring-boot:run
 ```
+*(Starts on http://localhost:8082)*
 
-✅ Server starts on **http://localhost:8082**
-
-### 4️⃣ Open the Frontend
-
-Simply open `frontend/index.html` in your browser — no build step required!
-
-```bash
-# Or use a live server
-cd frontend
-npx serve .
-```
+**4. Open the Frontend**
+Open `frontend/index.html` directly in your browser. (Note: When running manually without Nginx, you will need to update the API URLs in `app.js` to point to `localhost:8081` and `localhost:8082`).
 
 ---
 
@@ -322,7 +296,9 @@ spring:
     name: tempconv
   data:
     mongodb:
-      uri: mongodb://localhost:27017/temp_db
+      host: ${MONGODB_HOST:mongodb}
+      port: ${MONGODB_PORT:27017}
+      database: temp_db
 
 server:
   port: 8081
@@ -334,8 +310,11 @@ server:
 spring:
   application:
     name: currencyconvertor
-  mongodb:
-    uri: mongodb://localhost:27018/currency_db
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:mongodb}
+      port: ${MONGODB_PORT:27017}
+      database: currency_db
 
 server:
   port: 8082

@@ -28,10 +28,12 @@ services:
       context: ./tempconv
       dockerfile: Dockerfile
     container_name: temp-converter
+    entrypoint: ["java", "-jar", "app.jar", "--spring.data.mongodb.uri=mongodb://mongodb:27017/temp_db"]
     ports:
       - "8081:8081"
     environment:
       MONGODB_URI: mongodb://mongodb:27017/temp_db
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/temp_db
     depends_on:
       mongodb:
         condition: service_healthy
@@ -46,10 +48,12 @@ services:
       context: ./currencyconvertor
       dockerfile: Dockerfile
     container_name: currency-converter
+    entrypoint: ["java", "-jar", "app.jar", "--spring.data.mongodb.uri=mongodb://mongodb:27017/currency_db"]
     ports:
       - "8082:8082"
     environment:
       MONGODB_URI: mongodb://mongodb:27017/currency_db
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/currency_db
     depends_on:
       mongodb:
         condition: service_healthy

@@ -33,9 +33,7 @@ function switchTab(tab) {
     }
 }
 
-// ==========================================
-//  CURRENCY CONVERTER
-// ==========================================
+//Currency Converter
 async function convertCurrency() {
     const input = document.getElementById('currency-input');
     const amount = parseFloat(input.value);
@@ -120,9 +118,7 @@ async function loadCurrencyHistory() {
     }
 }
 
-// ==========================================
-//  TEMPERATURE CONVERTER
-// ==========================================
+//Temperature Converter
 async function convertTemperature() {
     const input = document.getElementById('temp-input');
     const value = parseFloat(input.value);
@@ -217,9 +213,7 @@ async function loadTempHistory() {
     }
 }
 
-// ==========================================
-//  EXERCISE 2: FILTERED HISTORY
-// ==========================================
+
 async function filterHistory() {
     const unit = document.getElementById('filter-unit').value;
     const tbody = document.getElementById('filtered-history-body');
@@ -269,9 +263,6 @@ async function filterHistory() {
     }
 }
 
-// ==========================================
-//  UTILITIES
-// ==========================================
 function formatNumber(num) {
     if (num === undefined || num === null) return '—';
     return Number(num).toLocaleString('en-US', {
@@ -344,9 +335,6 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// ==========================================
-//  KEYBOARD SHORTCUTS
-// ==========================================
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const currencySection = document.getElementById('section-currency');
@@ -363,9 +351,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// ==========================================
-//  SPINNING ANIMATION (for loading state)
-// ==========================================
 const spinStyle = document.createElement('style');
 spinStyle.textContent = `
     @keyframes spin {
@@ -378,9 +363,6 @@ spinStyle.textContent = `
 `;
 document.head.appendChild(spinStyle);
 
-// ==========================================
-//  INIT
-// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     loadCurrencyHistory();
 });
