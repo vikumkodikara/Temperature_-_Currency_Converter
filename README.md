@@ -365,6 +365,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Built with ❤️ using Spring Boot & MongoDB**
 
-*System Oriented Computing — Lab Practical 02*
-
 </div>
