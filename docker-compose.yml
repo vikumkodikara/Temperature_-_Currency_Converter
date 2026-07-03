@@ -1,0 +1,86 @@
+name: converter-app
+
+services:
+  # ============================================
+  # MongoDB — shared database for both backends
+  # ============================================
+  mongodb:
+    image: mongo:7.0
+    container_name: converter-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - converter-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ============================================
+  # Temperature Converter — Spring Boot (port 8081)
+  # ============================================
+  temp-converter:
+    build:
+      context: ./tempconv
+      dockerfile: Dockerfile
+    container_name: temp-converter
+    ports:
+      - "8081:8081"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/temp_db
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - converter-network
+
+  # ============================================
+  # Currency Converter — Spring Boot (port 8082)
+  # ============================================
+  currency-converter:
+    build:
+      context: ./currencyconvertor
+      dockerfile: Dockerfile
+    container_name: currency-converter
+    ports:
+      - "8082:8082"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/currency_db
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - converter-network
+
+  # ============================================
+  # Frontend — Nginx (port 80)
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: converter-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - temp-converter
+      - currency-converter
+    networks:
+      - converter-network
+
+# ============================================
+# Persistent volume for MongoDB data
+# ============================================
+volumes:
+  mongo-data:
+
+# ============================================
+# Custom network for inter-container comms
+# ============================================
+networks:
+  converter-network:
+    driver: bridge

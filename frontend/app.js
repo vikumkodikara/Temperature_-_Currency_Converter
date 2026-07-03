@@ -2,10 +2,9 @@
    ConvertHub — Application Logic
    =================================================== */
 
-// API Endpoints
-const CURRENCY_API = 'https://currency-converter.vikumkodikara123.workers.dev/api/currency';
-const TEMP_API = 'http://localhost:8081/api/temperatures'; // Local testing
-// const TEMP_API = 'https://temperature-converter.vikumkodikara123.workers.dev/api/temperatures'; // Deployed
+// API Endpoints (relative paths — Nginx reverse-proxies to backend containers)
+const CURRENCY_API = '/api/currency';
+const TEMP_API = '/api/temperatures';
 const TEMP_API_KEY = 'SUPER-SECRET-DEV-KEY-123'; // Must match a key in MongoDB api_keys collection
 
 // ==========================================

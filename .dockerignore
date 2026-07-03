@@ -1,0 +1,9 @@
+.git
+.github
+*.md
+frontend-react/
+tempconv/target/
+currencyconvertor/target/
+*.iml
+.idea/
+.vscode/
