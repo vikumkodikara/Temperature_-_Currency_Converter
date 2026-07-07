@@ -15,5 +15,7 @@ public class ApiKey {
 
     private String keyValue;
 
+    private String clientName;
+
     private boolean active;
 }
