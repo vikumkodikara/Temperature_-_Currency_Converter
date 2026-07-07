@@ -5,7 +5,7 @@
 // API Endpoints (relative paths — Nginx reverse-proxies to backend containers)
 const CURRENCY_API = '/api/currency';
 const TEMP_API = '/api/temperatures';
-const TEMP_API_KEY = 'SUPER-SECRET-DEV-KEY-123'; // Must match a key in MongoDB api_keys collection
+const API_KEY = 'SUPER-SECRET-DEV-KEY-123'; // Must match a key in MongoDB api_keys collection
 
 // ==========================================
 //  TAB SWITCHING
@@ -53,7 +53,10 @@ async function convertCurrency() {
 
     try {
         const res = await fetch(`${CURRENCY_API}/convert?usdAmount=${amount}`, {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'X-API-KEY': API_KEY
+            }
         });
 
         if (!res.ok) {
@@ -141,7 +144,7 @@ async function convertTemperature() {
         const res = await fetch(`${TEMP_API}/convert?value=${value}&unit=${unit}`, {
             method: 'POST',
             headers: {
-                'X-API-KEY': TEMP_API_KEY
+                'X-API-KEY': API_KEY
             }
         });
 
