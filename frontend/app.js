@@ -1,15 +1,14 @@
-/* ===================================================
+/* 
    ConvertHub — Application Logic
-   =================================================== */
+*/
 
-// API Endpoints (relative paths — Nginx reverse-proxies to backend containers)
+// API Endpoints 
 const CURRENCY_API = '/api/currency';
 const TEMP_API = '/api/temperatures';
 const API_KEY = 'SUPER-SECRET-DEV-KEY-123'; // Must match a key in MongoDB api_keys collection
 
-// ==========================================
 //  TAB SWITCHING
-// ==========================================
+
 function switchTab(tab) {
     const currencySection = document.getElementById('section-currency');
     const tempSection = document.getElementById('section-temperature');
@@ -75,7 +74,7 @@ async function convertCurrency() {
         document.getElementById('currency-rate-info').textContent = `Rate: 1 USD = ${data.exchangeRate} LKR`;
         document.getElementById('currency-time-info').textContent = formatTimestamp(data.timestamp);
 
-        showToast('Conversion successful! ✨', 'success');
+        showToast('Conversion successful!', 'success');
         loadCurrencyHistory();
 
     } catch (err) {
@@ -252,7 +251,7 @@ async function filterHistory() {
             </tr>
         `).join('');
 
-        showToast(`Found ${data.length} ${unit} records! 🔍`, 'success');
+        showToast(`Found ${data.length} ${unit} records!`, 'success');
 
     } catch (err) {
         console.error('Filter history error:', err);
