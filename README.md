@@ -208,10 +208,14 @@ POST /api/currency/convert?usdAmount={amount}
 |-------------|----------|---------------------------------------|
 | `usdAmount` | `double` | **Required.** USD amount to convert   |
 
+**Header Requirements:**
+- `X-API-KEY`: **Required.** (e.g., `SUPER-SECRET-DEV-KEY-123`)
+
 **Example Request:**
 
 ```bash
-curl -X POST "http://localhost:8082/api/currency/convert?usdAmount=50"
+curl -X POST "http://localhost:8082/api/currency/convert?usdAmount=50" \
+  -H "X-API-KEY: SUPER-SECRET-DEV-KEY-123"
 ```
 
 **Example Response:**
@@ -228,6 +232,23 @@ curl -X POST "http://localhost:8082/api/currency/convert?usdAmount=50"
 }
 ```
 
+#### Rate Check
+
+```http
+GET /api/currency/rate-check?usdAmount={amount}
+```
+
+**Example Request:**
+
+```bash
+curl "http://localhost:8082/api/currency/rate-check?usdAmount=50"
+```
+
+**Example Response (Text):**
+```text
+The conversion of $50.0 USD to 15000.0 LKR is a standard transaction.
+```
+
 #### Get Conversion History
 
 ```http
@@ -238,6 +259,18 @@ GET /api/currency/history
 
 ```bash
 curl http://localhost:8082/api/currency/history
+```
+
+#### Filter History
+
+```http
+GET /api/currency/history/filter?currency={currency}
+```
+
+**Example:**
+
+```bash
+curl "http://localhost:8082/api/currency/history/filter?currency=USD"
 ```
 
 ---
