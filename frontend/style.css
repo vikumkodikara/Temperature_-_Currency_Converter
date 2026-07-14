@@ -618,6 +618,46 @@ body {
     background: rgba(244, 63, 94, 0.05);
 }
 
+/* ===== History Actions Group ===== */
+.history-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clear-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    border-radius: var(--radius-sm);
+    background: rgba(244, 63, 94, 0.06);
+    color: var(--accent-rose);
+    font-family: var(--font);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.clear-btn:hover {
+    background: rgba(244, 63, 94, 0.14);
+    border-color: var(--accent-rose);
+    box-shadow: 0 0 12px rgba(244, 63, 94, 0.2);
+    transform: translateY(-1px);
+}
+
+.clear-btn:active {
+    transform: translateY(0);
+}
+
+.clear-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .history-table-wrapper {
     overflow-x: auto;
     border-radius: var(--radius-md);

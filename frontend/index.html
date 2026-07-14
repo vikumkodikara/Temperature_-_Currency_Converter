@@ -137,14 +137,26 @@
             <div class="history-card">
                 <div class="history-header">
                     <h3>Conversion History</h3>
-                    <button class="refresh-btn" onclick="loadCurrencyHistory()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M1 4v6h6" />
-                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-                        </svg>
-                        Refresh
-                    </button>
+                    <div class="history-actions">
+                        <button class="refresh-btn" id="btn-refresh-currency" onclick="loadCurrencyHistory()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M1 4v6h6" />
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                            </svg>
+                            Refresh
+                        </button>
+                        <button class="clear-btn" id="btn-clear-currency" onclick="clearCurrencyHistory()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                <path d="M10 11v6M14 11v6" />
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            </svg>
+                            Clear History
+                        </button>
+                    </div>
                 </div>
                 <div class="history-table-wrapper">
                     <table class="history-table" id="currency-history-table">
@@ -274,14 +286,26 @@
             <div class="history-card">
                 <div class="history-header">
                     <h3>Conversion History</h3>
-                    <button class="refresh-btn temp-refresh" onclick="loadTempHistory()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M1 4v6h6" />
-                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-                        </svg>
-                        Refresh
-                    </button>
+                    <div class="history-actions">
+                        <button class="refresh-btn temp-refresh" id="btn-refresh-temp" onclick="loadTempHistory()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M1 4v6h6" />
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                            </svg>
+                            Refresh
+                        </button>
+                        <button class="clear-btn temp-clear" id="btn-clear-temp" onclick="clearTempHistory()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                <path d="M10 11v6M14 11v6" />
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            </svg>
+                            Clear History
+                        </button>
+                    </div>
                 </div>
                 <div class="history-table-wrapper">
                     <table class="history-table" id="temp-history-table">

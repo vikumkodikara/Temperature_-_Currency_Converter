@@ -28,8 +28,8 @@ public class CurrencyController {
 
     @PostMapping("/convert")
     public CurrencyLog convertCurrency(@RequestParam(name = "usdAmount", required = false) Double usdAmount,
-                                       @RequestHeader(value = "X-API-KEY", required = false) String apiKey,
-                                       HttpServletRequest request) {
+            @RequestHeader(value = "X-API-KEY", required = false) String apiKey,
+            HttpServletRequest request) {
         // tolerate a common typo that was seen in Postman: "usdAmout"
         if (usdAmount == null) {
             String alt = request.getParameter("usdAmout");
@@ -54,7 +54,6 @@ public class CurrencyController {
         return currencyService.getAllLogs();
     }
 
-    // Clear all conversion history
     @DeleteMapping("/history")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearHistory() {
@@ -67,7 +66,6 @@ public class CurrencyController {
         return currencyService.rateCheck(usdAmount);
     }
 
-    // Exercise 2: Filter history by input currency - returns JSON array
     @GetMapping("/history/filter")
     public List<CurrencyLog> filterHistory(@RequestParam String currency) {
         return currencyService.getHistoryByCurrency(currency);

@@ -2,9 +2,12 @@
    ConvertHub — Application Logic
 */
 
-// API Endpoints 
-const CURRENCY_API = '/api/currency';
-const TEMP_API = '/api/temperatures';
+// API Endpoints
+// When served via Docker/nginx on port 80 → use relative paths (nginx proxies to backends)
+// When served directly via local dev server (any other port) → hit backends directly
+const _isDev = window.location.port !== '' && window.location.port !== '80';
+const CURRENCY_API = _isDev ? 'http://localhost:8082/api/currency'  : '/api/currency';
+const TEMP_API     = _isDev ? 'http://localhost:8081/api/temperatures' : '/api/temperatures';
 const API_KEY = 'SUPER-SECRET-DEV-KEY-123'; // Must match a key in MongoDB api_keys collection
 
 //  TAB SWITCHING
@@ -120,6 +123,36 @@ async function loadCurrencyHistory() {
     }
 }
 
+async function clearCurrencyHistory() {
+    if (!confirm('Are you sure you want to clear all currency conversion history? This cannot be undone.')) return;
+
+    const btn = document.getElementById('btn-clear-currency');
+    btn.disabled = true;
+    btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="30 60"/></svg>
+        Clearing...
+    `;
+
+    try {
+        const res = await fetch(`${CURRENCY_API}/history`, { method: 'DELETE' });
+        if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
+        showToast('Currency history cleared!', 'success');
+        loadCurrencyHistory();
+    } catch (err) {
+        console.error('Clear currency history error:', err);
+        showToast(`Error clearing history: ${err.message}`, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+            Clear History
+        `;
+    }
+}
+
 //Temperature Converter
 async function convertTemperature() {
     const input = document.getElementById('temp-input');
@@ -212,6 +245,36 @@ async function loadTempHistory() {
     } catch (err) {
         console.error('Load temp history error:', err);
         tbody.innerHTML = '<tr class="empty-row"><td colspan="5" style="color: var(--accent-rose)">⚠ Could not load history. Is server running?</td></tr>';
+    }
+}
+
+async function clearTempHistory() {
+    if (!confirm('Are you sure you want to clear all temperature conversion history? This cannot be undone.')) return;
+
+    const btn = document.getElementById('btn-clear-temp');
+    btn.disabled = true;
+    btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin"><circle cx="12" cy="12" r="10" stroke-dasharray="30 60"/></svg>
+        Clearing...
+    `;
+
+    try {
+        const res = await fetch(`${TEMP_API}/history`, { method: 'DELETE' });
+        if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
+        showToast('Temperature history cleared!', 'success');
+        loadTempHistory();
+    } catch (err) {
+        console.error('Clear temp history error:', err);
+        showToast(`Error clearing history: ${err.message}`, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+            Clear History
+        `;
     }
 }
 
