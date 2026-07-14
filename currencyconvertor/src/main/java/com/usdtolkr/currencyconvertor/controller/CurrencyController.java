@@ -6,6 +6,7 @@ import com.usdtolkr.currencyconvertor.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -51,6 +52,13 @@ public class CurrencyController {
     @GetMapping("/history")
     public List<CurrencyLog> getHistory() {
         return currencyService.getAllLogs();
+    }
+
+    // Clear all conversion history
+    @DeleteMapping("/history")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clearHistory() {
+        currencyService.clearHistory();
     }
 
     // Exercise 1: Rate check endpoint - returns plain text

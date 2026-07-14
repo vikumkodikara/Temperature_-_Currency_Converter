@@ -70,4 +70,9 @@ public class CurrencyService {
         String normalizedCurrency = currency.trim().toUpperCase();
         return currencyRepository.findByInputCurrency(normalizedCurrency);
     }
+
+    // Clear all conversion history
+    public void clearHistory() {
+        currencyRepository.deleteAll();
+    }
 }

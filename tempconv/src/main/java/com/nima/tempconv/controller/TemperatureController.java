@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -38,6 +39,13 @@ public class TemperatureController {
     @GetMapping("/history")
     public List<TemperatureLog> history() {
         return temperatureService.getHistory();
+    }
+
+    // Clear all conversion history
+    @DeleteMapping("/history")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clearHistory() {
+        temperatureService.clearHistory();
     }
 
     // Exercise 1: Safety check endpoint - returns plain text

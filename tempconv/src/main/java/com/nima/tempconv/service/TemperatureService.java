@@ -112,6 +112,11 @@ public class TemperatureService {
         return temperatureRepository.findByInputUnit(formattedUnit);
     }
 
+    // Clear all conversion history
+    public void clearHistory() {
+        temperatureRepository.deleteAll();
+    }
+
     private String normalize(String unit) {
         if (unit == null) {
             return "";
