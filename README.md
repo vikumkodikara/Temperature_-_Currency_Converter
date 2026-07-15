@@ -53,12 +53,13 @@
            │                              │
            └───────────────┬──────────────┘
                            │
-                    Port 27017 (Internal)
-                           │
-┌──────────────────────────▼───────────────────────────────┐
-│                 MongoDB (mongo:7.0)                      │
-│        Shared Database for temp_db & currency_db         │
-└──────────────────────────────────────────────────────────┘
+                    Host 27018 -> temp_db
+                    Host 27017 -> currency_db
+
+                ┌──────────────────────────▼───────────────────────────────┐
+                │                 temp-mongodb (mongo:7.0)                 │
+                │                 currency-mongodb (mongo:7.0)             │
+                └──────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -127,7 +128,7 @@ Once running, simply open your browser to **http://localhost**
 If you prefer to run the services without Docker, you will need Java 21 and MongoDB installed locally.
 
 **1. Start MongoDB**
-Start a local MongoDB instance on port `27017`. Both backends are configured to connect to `mongodb://localhost:27017`.
+Start two local MongoDB instances if you run the apps outside Docker: Temperature on port `27018` and Currency on port `27017`.
 
 **2. Start Temperature Converter**
 ```bash
@@ -329,8 +330,8 @@ spring:
     name: tempconv
   data:
     mongodb:
-      host: ${MONGODB_HOST:mongodb}
-      port: ${MONGODB_PORT:27017}
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27018}
       database: temp_db
 
 server:
@@ -345,7 +346,7 @@ spring:
     name: currencyconvertor
   data:
     mongodb:
-      host: ${MONGODB_HOST:mongodb}
+      host: ${MONGODB_HOST:localhost}
       port: ${MONGODB_PORT:27017}
       database: currency_db
 

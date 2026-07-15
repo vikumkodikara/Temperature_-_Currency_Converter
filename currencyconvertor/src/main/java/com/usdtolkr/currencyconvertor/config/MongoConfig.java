@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @Configuration
 public class MongoConfig {
 
-    @Value("${MONGODB_URI:mongodb://mongodb:27017/currency_db}")
+    @Value("${MONGODB_URI:mongodb://localhost:27017/currency_db}")
     private String mongoUri;
 
     @Bean

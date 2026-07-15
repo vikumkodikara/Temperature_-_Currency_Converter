@@ -1,11 +1,10 @@
 spring:
   application:
     name: currencyconvertor
-  data:
-    mongodb:
-      host: ${MONGODB_HOST:mongodb}
-      port: ${MONGODB_PORT:27017}
-      database: currency_db
+  mongodb:
+    host: ${MONGODB_HOST:localhost}
+    port: ${MONGODB_PORT:27017}
+    database: currency_db
 
 server:
   port: 8082

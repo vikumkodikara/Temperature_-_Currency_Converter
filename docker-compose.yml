@@ -1,15 +1,16 @@
 name: converter-app
 
 services:
-  # MongoDB — shared database for both backends
-
-  mongodb:
+  # ============================================
+  # Temperature Database (host port 27018)
+  # ============================================
+  temp-mongodb:
     image: mongo:7.0
-    container_name: converter-mongodb
+    container_name: temp-mongodb
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
-      - mongo-data:/data/db
+      - temp-mongo-data:/data/db
     networks:
       - converter-network
     healthcheck:
@@ -19,21 +20,43 @@ services:
       retries: 5
       start_period: 10s
 
-  # Temperature Converter — Spring Boot (port 8081)
+  # ============================================
+  # Currency Database (host port 27017)
+  # ============================================
+  currency-mongodb:
+    image: mongo:7.0
+    container_name: currency-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - currency-mongo-data:/data/db
+    networks:
+      - converter-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
+  # ============================================
+  # Temperature Converter — Spring Boot (port 8081)
+  # ============================================
   temp-converter:
     build:
       context: ./tempconv
       dockerfile: Dockerfile
     container_name: temp-converter
-    entrypoint: [ "java", "-jar", "app.jar", "--spring.data.mongodb.uri=mongodb://mongodb:27017/temp_db" ]
+    entrypoint: [ "java", "-jar", "app.jar" ]
     ports:
       - "8081:8081"
     environment:
-      MONGODB_URI: mongodb://mongodb:27017/temp_db
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/temp_db
+      MONGODB_URI: mongodb://temp-mongodb:27017/temp_db
+      SPRING_DATA_MONGODB_URI: mongodb://temp-mongodb:27017/temp_db
+      MONGODB_HOST: temp-mongodb
+      MONGODB_PORT: 27017
     depends_on:
-      mongodb:
+      temp-mongodb:
         condition: service_healthy
     networks:
       - converter-network
@@ -46,14 +69,16 @@ services:
       context: ./currencyconvertor
       dockerfile: Dockerfile
     container_name: currency-converter
-    entrypoint: [ "java", "-jar", "app.jar", "--spring.data.mongodb.uri=mongodb://mongodb:27018/currency_db" ]
+    entrypoint: [ "java", "-jar", "app.jar" ]
     ports:
       - "8082:8082"
     environment:
-      MONGODB_URI: mongodb://mongodb:27017/currency_db
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/currency_db
+      MONGODB_URI: mongodb://currency-mongodb:27017/currency_db
+      SPRING_DATA_MONGODB_URI: mongodb://currency-mongodb:27017/currency_db
+      MONGODB_HOST: currency-mongodb
+      MONGODB_PORT: 27017
     depends_on:
-      mongodb:
+      currency-mongodb:
         condition: service_healthy
     networks:
       - converter-network
@@ -75,14 +100,15 @@ services:
       - converter-network
 
 # ============================================
-# Persistent volume for MongoDB data
+# Persistent volumes
 # ============================================
 volumes:
-  mongo-data:
+  temp-mongo-data:
+  currency-mongo-data:
 
-    # ============================================
-    # Custom network for inter-container comms
-    # ============================================
+# ============================================
+# Custom network for inter-container comms
+# ============================================
 networks:
   converter-network:
     driver: bridge
